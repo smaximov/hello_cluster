@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  main:
+    build:
+      context: .
+      args:
+        RELEASE_NAME: hello_cluster_main
+    ports:
+      - "4000:4000"
+    environment:
+      RELEASE_NODE: hello_cluster_main
+      RELEASE_COOKIE: secret
+
+  worker-1:
+    build:
+      context: .
+      args:
+        RELEASE_NAME: hello_cluster_worker
+    environment:
+      RELEASE_NODE: hello_cluster_worker_1
+      RELEASE_COOKIE: secret
+
+  worker-2:
+    build:
+      context: .
+      args:
+        RELEASE_NAME: hello_cluster_worker
+    environment:
+      RELEASE_NODE: hello_cluster_worker_2
+      RELEASE_COOKIE: secret
