@@ -1,7 +1,11 @@
 defmodule HelloClusterMain do
   @spec greet() :: String.t()
   def greet do
-    {:ok, pid} = start_worker(HelloClusterWorker.StatelessWorker)
+    # We add randomness to child spec of `StatelessWorker` because otherwise
+    # it would be started on the same node every time (`Horde.DynamicSupervisor`
+    # by default used a hash ring strategy with child spec as a hash key to
+    # choose a node for a process):
+    {:ok, pid} = start_worker(HelloClusterWorker.StatelessWorker, :rand.uniform())
 
     GenServer.call(pid, :greet)
   end
@@ -21,6 +25,5 @@ defmodule HelloClusterMain do
   end
 
   @worker_starter {:via, Horde.Registry, {HelloCluster.Registry, HelloClusterWorker.Starter}}
-
-  defp start_worker(module, arg \\ []), do: GenServer.call(@worker_starter, {:start_worker, {module, arg}})
+  defp start_worker(module, arg), do: GenServer.call(@worker_starter, {:start_worker, {module, arg}})
 end
